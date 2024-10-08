@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.IO;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Xml.Linq;
 
 namespace QuanlaInterpreter
 {
-    public class QProject(string Name = "New Project")
+    public class QProject(string name = "New Project")
     {
-        public string WorkingDirectory { get; set; }
+        public string Name { get; set; } = name;
+        public string WorkingDirectory { get; set; } = string.Empty;
         public List<QFile> Files { get; set; } = [];
 
         void CreateWorkingDirectory(string workingDirectory)
@@ -25,39 +21,48 @@ namespace QuanlaInterpreter
             WorkingDirectory = workingDirectory;
             return workingDirectory;
         }
-    }
 
-    public class QFile
-    {
-        public enum FileType
+        public QFile CreateFile(string name, QFile.FileType fileType)
         {
-            /// <summary>.qPro - Project, contains all the linking informations for the files in the project</summary>
-            Project,
+            QFile file = new(WorkingDirectory)
+            {
+                Name = name,
+                Extension = QFile.FileExtensions[fileType]
+            };
 
-            /// <summary>.qInf - Metadata, contains comments and other documenting infromations for the language elements like functions, classes, etc.</summary>
-            Metadata,
+            Files.Add(file);
+            return file;
+        }
+        public QFile CreateProjectFile() =>
+            CreateFile(Name, QFile.FileType.Project);
 
-            /// <summary>.qSrc - Source, contains the source code of a Quanla program</summary>
-            Source,
+        private void UpdateProjectFile()
+        {
+            QFile projectFile = Files.FirstOrDefault(f => f.Extension == QFile.FileExtensions[QFile.FileType.Project]);
+            if (projectFile is null)
+                projectFile = CreateProjectFile();
 
-            /// <summary>.qLiv - Live Script, contains the source code of a Quanla program that is to be executed in a live environment (presentation, TeX, figures etc.)</summary>
-            LiveScript,
+            XDocument doc = new();
+            XElement root = new("Project");
+            doc.Add(root);
 
-            /// <summary>.qBox - Workspace data, contains the data of a workspace, like variables or equations</summary>
-            WorkspaceData
+            foreach (var file in Files)
+            {
+                XElement fileElement = new("File");
+                fileElement.Add(new XAttribute("Name", file.Name));
+                fileElement.Add(new XAttribute("Extension", file.Extension));
+                root.Add(fileElement);
+            }
+
+            doc.Save(projectFile.FullPath);
         }
 
-        public Dictionary<FileType, string> FileExtensions = new Dictionary<FileType, string>
+        public QFile CreateDataFile(string name, QFile.FileType type)
         {
-            {FileType.Project, ".qPro"},
-            {FileType.Metadata, ".qInf"},
-            {FileType.Source, ".qSrc"},
-            {FileType.LiveScript, ".qLiv"},
-            {FileType.WorkspaceData, ".qBox"}
-        };
-
-        public string Name { get; set; }
-        public string Path { get; set; }
-        public string Extension { get; set; }
+            QFile file = CreateFile(name, type);
+            UpdateProjectFile();
+            file.Create();
+            return file;
+        }
     }
 }

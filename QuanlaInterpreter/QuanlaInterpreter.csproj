@@ -8,4 +8,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\nejlontacsko\SteradianLib\Steradian.CoreLib\Steradian.CoreLib.csproj" />
+  </ItemGroup>
+
 </Project>

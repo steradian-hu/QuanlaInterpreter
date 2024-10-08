@@ -1,0 +1,29 @@
+﻿# Namespace is a way to group variables and functions under a common name
+namespace QuanlaInterpreter.Examples.FirstProject
+
+# Prints all of the available features
+help keywords
+help commands
+help operators
+help quantities
+
+# Create variables
+var Pressure: p = 1 atm
+var Area: A = 3 m^2
+
+# Unknown variable value means a symbol which can be used in an equation
+sym Force: F = ?
+
+# Create an equation and solve it to find the unknown variable value
+eqn e: p = F / A
+solve e
+
+# Print the result with unit conversion
+print F unit N
+
+# Creates a file which holds all the variables and their values
+save workspace
+clear
+
+# Closes the program
+exit
