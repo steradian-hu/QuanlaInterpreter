@@ -11,5 +11,17 @@ namespace QuanlaInterpreter.Code
         where T : IGenericToken<T>
     {
         static abstract T? FromCode(string keyword);
+
+        List<string> Parameters { get; }
+    }
+
+    public interface IUserDefinedToken : IToken
+    {
+        string Name { get; }
+    }
+
+    public interface ILiteralToken : IToken
+    {
+        string Value { get; }
     }
 }

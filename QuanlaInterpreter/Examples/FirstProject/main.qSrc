@@ -3,7 +3,7 @@ namespace QuanlaInterpreter.Examples.FirstProject
 
 # Prints all of the available features
 help keywords
-help commands
+help nameables
 help operators
 help quantities
 
@@ -12,7 +12,7 @@ var Pressure: p = 1 atm
 var Area: A = 3 m^2
 
 # Unknown variable value means a symbol which can be used in an equation
-sym Force: F = ?
+sym Force F = ?
 
 # Create an equation and solve it to find the unknown variable value
 eqn e: p = F / A
@@ -20,6 +20,15 @@ solve e
 
 # Print the result with unit conversion
 print F unit N
+
+# Create an empty variable, the default unit will be used, than the expression puts a value inside it
+var Force: F_2 = ?
+expr F_2 = F + 2 kg*m/s^2
+print F_2 unit mN
+
+# Every variable can be attached to others with directed edges to build trees for example, than list every relevant edges
+edge F -> F2
+print F_2 edge ?
 
 # Creates a file which holds all the variables and their values
 save workspace
