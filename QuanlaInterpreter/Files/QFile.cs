@@ -1,4 +1,4 @@
-﻿namespace QuanlaInterpreter
+﻿namespace QuanlaInterpreter.Files
 {
     public class QFile(string workingDirectory)
     {

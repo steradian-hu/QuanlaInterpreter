@@ -6,9 +6,9 @@ using Steradian.CoreLib.Utils.Colors;
 
 using System.Drawing;
 
-namespace QuanlaInterpreter
+namespace QuanlaInterpreter.Code
 {
-    public class Code
+    public class Words
     {
         public enum WhiteSpace
         {
@@ -30,6 +30,7 @@ namespace QuanlaInterpreter
             Help,               // help
             Variable,           // var
             Symbol,             // sym
+            Equation,           // eqn
             Solve,              // solve
             Print,              // print
             Save,               // save
@@ -57,6 +58,7 @@ namespace QuanlaInterpreter
             One,
             Pressure,
             Length,
+            Area, //TODO: Complex quantities should be created by combining basic quantities
             Force
         }
 
@@ -68,15 +70,15 @@ namespace QuanlaInterpreter
         // Use a command: <command> [arguments]
     }
 
-    public class WhiteSpace(Code.WhiteSpace ws)
+    public class WhiteSpace(Words.WhiteSpace ws)
         : IGenericToken<WhiteSpace>
     {
         public static WhiteSpace? FromCode(string keyword) =>
             keyword switch
             {
-                "\t" => new WhiteSpace(Code.WhiteSpace.Tab),
-                "\n" => new WhiteSpace(Code.WhiteSpace.NewLine),
-                "\r" => new WhiteSpace(Code.WhiteSpace.CarriageReturn),
+                "\t" => new WhiteSpace(Words.WhiteSpace.Tab),
+                "\n" => new WhiteSpace(Words.WhiteSpace.NewLine),
+                "\r" => new WhiteSpace(Words.WhiteSpace.CarriageReturn),
                 _ => null
             };
 
@@ -86,16 +88,16 @@ namespace QuanlaInterpreter
         Color IColoredComponent.AssociatedDrawingColor { get; set; } = Color.White;
     }
 
-    public class Keyword(Code.Keyword keyword)
+    public class Keyword(Words.Keyword keyword)
         : IGenericToken<Keyword>
     {
         public static Keyword? FromCode(string keyword) =>
             keyword switch
             {
-                "namespace" => new Keyword(Code.Keyword.Namespace),
-                "#" => new Keyword(Code.Keyword.Comment),
-                "unit" => new Keyword(Code.Keyword.Unit),
-                "exit" => new Keyword(Code.Keyword.Exit),
+                "namespace" => new Keyword(Words.Keyword.Namespace),
+                "#" => new Keyword(Words.Keyword.Comment),
+                "unit" => new Keyword(Words.Keyword.Unit),
+                "exit" => new Keyword(Words.Keyword.Exit),
                 _ => null
             };
 
@@ -105,19 +107,20 @@ namespace QuanlaInterpreter
         Color IColoredComponent.AssociatedDrawingColor { get; set; } = Color.DarkBlue;
     }
 
-    public class Command(Code.Command command)
+    public class Command(Words.Command command)
         : IGenericToken<Command>
     {
         public static Command? FromCode(string keyword) =>
             keyword switch
             {
-                "help" => new Command(Code.Command.Help),
-                "var" => new Command(Code.Command.Variable),
-                "sym" => new Command(Code.Command.Symbol),
-                "solve" => new Command(Code.Command.Solve),
-                "print" => new Command(Code.Command.Print),
-                "save" => new Command(Code.Command.Save),
-                "clear" => new Command(Code.Command.Clear),
+                "help" => new Command(Words.Command.Help),
+                "var" => new Command(Words.Command.Variable),
+                "sym" => new Command(Words.Command.Symbol),
+                "eqn" => new Command(Words.Command.Equation),
+                "solve" => new Command(Words.Command.Solve),
+                "print" => new Command(Words.Command.Print),
+                "save" => new Command(Words.Command.Save),
+                "clear" => new Command(Words.Command.Clear),
                 _ => null
             };
 
@@ -127,24 +130,24 @@ namespace QuanlaInterpreter
         Color IColoredComponent.AssociatedDrawingColor { get; set; } = Color.Blue;
     }
 
-    public class Operator(Code.Operators op)
+    public class Operator(Words.Operators op)
         : IGenericToken<Operator>
     {
         public static Operator? FromCode(string keyword) =>
             keyword switch
             {
-                "=" => new Operator(Code.Operators.Equivalent),
-                "+" => new Operator(Code.Operators.Addition),
-                "-" => new Operator(Code.Operators.Subtraction),
-                "*" => new Operator(Code.Operators.Multiplication),
-                "^" => new Operator(Code.Operators.Power),
-                "/" => new Operator(Code.Operators.FractionalDivision),
-                "div" => new Operator(Code.Operators.FloorDivision),
-                "mod" => new Operator(Code.Operators.Modulus),
-                "_" => new Operator(Code.Operators.Underscore),
-                "?" => new Operator(Code.Operators.QuestionMark),
-                ":" => new Operator(Code.Operators.Colon),
-                "°" => new Operator(Code.Operators.Degree),
+                "=" => new Operator(Words.Operators.Equivalent),
+                "+" => new Operator(Words.Operators.Addition),
+                "-" => new Operator(Words.Operators.Subtraction),
+                "*" => new Operator(Words.Operators.Multiplication),
+                "^" => new Operator(Words.Operators.Power),
+                "/" => new Operator(Words.Operators.FractionalDivision),
+                "div" => new Operator(Words.Operators.FloorDivision),
+                "mod" => new Operator(Words.Operators.Modulus),
+                "_" => new Operator(Words.Operators.Underscore),
+                "?" => new Operator(Words.Operators.QuestionMark),
+                ":" => new Operator(Words.Operators.Colon),
+                "°" => new Operator(Words.Operators.Degree),
                 _ => null
             };
 
@@ -154,12 +157,12 @@ namespace QuanlaInterpreter
         Color IColoredComponent.AssociatedDrawingColor { get; set; } = Color.Yellow;
     }
 
-    public class Quantity(Code.Quantities quantity)
+    public class Quantity(Words.Quantities quantity)
         : IGenericToken<Quantity>
     {
         public static Quantity? FromCode(string keyword) =>
             int.TryParse(keyword, out var _) ? null :
-            Enum.TryParse<Code.Quantities>(keyword, out var quantity) ?
+            Enum.TryParse<Words.Quantities>(keyword, out var quantity) ?
                 new Quantity(quantity) : null;
 
         public string Word => quantity.ToString();
@@ -167,11 +170,11 @@ namespace QuanlaInterpreter
         public IPhysicalUnit GetQuntityUnit() =>
             quantity switch
             {
-                Code.Quantities.One => new One(),
-                Code.Quantities.Pressure => new Pressure(),
-                Code.Quantities.Length => new Length(),
+                Words.Quantities.One => new One(),
+                Words.Quantities.Pressure => new Pressure(),
+                Words.Quantities.Length => new Length(),
                 //Code.Quantities.Force => new Force(),
-                _ => throw new System.NotImplementedException("Unknown quantity: " + quantity)
+                _ => throw new NotImplementedException("Unknown quantity: " + quantity)
             };
 
         ConsoleColor IColoredComponent.AssociatedConsoleColor { get; set; } = ConsoleColor.Cyan;

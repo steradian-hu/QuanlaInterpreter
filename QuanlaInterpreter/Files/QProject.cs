@@ -1,6 +1,6 @@
 ﻿using System.Xml.Linq;
 
-namespace QuanlaInterpreter
+namespace QuanlaInterpreter.Files
 {
     public class QProject(string name = "New Project")
     {
@@ -8,7 +8,7 @@ namespace QuanlaInterpreter
         public string WorkingDirectory { get; set; } = string.Empty;
         public List<QFile> Files { get; set; } = [];
 
-        void CreateWorkingDirectory(string workingDirectory)
+        static void CreateWorkingDirectory(string workingDirectory)
         {
             if (!Directory.Exists(workingDirectory))
                 Directory.CreateDirectory(workingDirectory);
@@ -38,9 +38,8 @@ namespace QuanlaInterpreter
 
         private void UpdateProjectFile()
         {
-            QFile projectFile = Files.FirstOrDefault(f => f.Extension == QFile.FileExtensions[QFile.FileType.Project]);
-            if (projectFile is null)
-                projectFile = CreateProjectFile();
+            QFile? projectFile = Files.FirstOrDefault(f => f.Extension == QFile.FileExtensions[QFile.FileType.Project]);
+            projectFile ??= CreateProjectFile();
 
             XDocument doc = new();
             XElement root = new("Project");

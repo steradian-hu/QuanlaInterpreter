@@ -1,18 +1,5 @@
-﻿using Steradian.CoreLib.Utils.Colors;
-
-namespace QuanlaInterpreter
+﻿namespace QuanlaInterpreter.Code
 {
-    public interface IToken : IColoredComponent
-    {
-       string Word { get; }
-    }
-
-    public interface IGenericToken<T> : IToken
-        where T : IGenericToken<T>
-    {
-        static abstract T? FromCode(string keyword);
-    }
-
     public class Lexer
     {
         public static IToken? FromCode(string keyword)
@@ -29,7 +16,12 @@ namespace QuanlaInterpreter
 
         public static IEnumerable<IToken> Tokenize(string code)
         {
-            code = code.Replace("\n", " \n ").Replace("\r", " \r ").Replace("\t", " \t ");
+            code = code
+                .Replace("\n", " \n ")
+                .Replace("\r", " \r ")
+                .Replace("\t", " \t ")
+                .Replace(":", " : ");
+
             string[] tokens = code.Split(' ');
             foreach (var token in tokens)
             {
@@ -38,5 +30,8 @@ namespace QuanlaInterpreter
                     yield return t;
             }
         }
+
+        public static IEnumerable<IToken> FilterEmptyLines(IEnumerable<IToken> tokens) =>
+            tokens.Where(t => t.Word != "");
     }
 }
